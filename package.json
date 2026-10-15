@@ -1,0 +1,16 @@
+{
+  "name": "pi-desktop-taskpanel",
+  "version": "0.5.1",
+  "private": true,
+  "description": "A PI-Desktop plugin that shows a live, per-session task checklist in its own panel — each conversation is a collapsible card titled with its real name, read from the local pi.sqlite.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/test-taskpanel.js && node test/test-render.js",
+    "test:logic": "node test/test-taskpanel.js",
+    "test:render": "node test/test-render.js",
+    "pack": "node scripts/pack.js"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

@@ -1,0 +1,16 @@
+# build output
+dist/
+*.piplug
+
+# test scratch
+test/tp-test-home/
+
+# node
+node_modules/
+npm-debug.log*
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

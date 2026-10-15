@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="pi-plugin-chrome" content="v2" />
+    <title></title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <!--
+      PI-Desktop reserves a transparent 46px drag band at the top and overlays
+      the host window-control capsule. The visible header below is the plugin's
+      own; its interactive controls opt out of dragging via -webkit-app-region.
+    -->
+    <header class="tp-header" id="tp-header">
+      <div class="tp-header__lead">
+        <span class="tp-header__mark" aria-hidden="true"></span>
+        <h1 class="tp-title" id="tp-title"></h1>
+        <span class="tp-count" id="tp-count"></span>
+      </div>
+      <div class="tp-header__trail">
+        <!-- 全部折叠 / 展开：多张卡片时才显示 -->
+        <button class="tp-toggle-all" id="tp-toggle-all" type="button" hidden></button>
+        <!-- 中 / 英切换：默认中文，选择记在本地 -->
+        <!-- 恢复自动排序：拖动过卡片顺序后才显示 -->
+        <button class="tp-reset-order" id="tp-reset-order" type="button" hidden></button>
+        <button class="tp-lang" id="tp-lang" type="button"></button>
+        <span class="tp-meta" id="tp-meta"></span>
+      </div>
+    </header>
+
+    <!-- 每个会话一张可折叠卡片，全部堆在这里（手风琴） -->
+    <main class="tp-root" id="tp-root"></main>
+
+    <p class="tp-sr" id="tp-status" role="status" aria-live="polite"></p>
+
+    <script src="panel.js" defer></script>
+  </body>
+</html>

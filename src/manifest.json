@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "id": "local.taskpanel",
+  "name": "Task Panel",
+  "version": "0.5.1",
+  "description": "A live task checklist in its own panel, split per session: each conversation is its own collapsible card — titled with the conversation's real name — so several running tasks show at once and never overwrite each other. Shows done / in-progress / todo / blocked in real time.",
+  "license": "MIT",
+  "author": "PI-Desktop user",
+  "categories": ["productivity", "developer-tools"],
+  "safetyNotes": "Requests two permissions: ui.panel and agent.tool.register. Registers one agent tool (task_update) that writes the current checklist — keyed by session — to this plugin's own data directory under the PI-Desktop user folder. To label each card with its real conversation name and show running / finished state, the panel opens the local pi.sqlite read-only and reads only the sessions title and the latest turn status — never any message body, and never writing to the database. Also listens to the session:turnEnded host event (session id, turn id and reason only) as a fallback. No workspace access, no network, no clipboard, no shell. The checklist text comes only from the model's tool call.",
+  "i18n": {
+    "en": {
+      "name": "Task Panel",
+      "description": "A live task checklist in its own panel, split per session: each conversation is its own collapsible card — titled with the conversation's real name — so several running tasks show at once and never overwrite each other. Shows done / in-progress / todo / blocked in real time.",
+      "safetyNotes": "Requests two permissions: ui.panel and agent.tool.register. Registers one agent tool (task_update) that writes the checklist — keyed by session — to this plugin's own data directory. To label each card with its real conversation name and running / finished state, the panel opens the local pi.sqlite read-only and reads only the sessions title and latest turn status — never message bodies, never writing. Also listens to session:turnEnded (session id, turn id and reason only) as a fallback. No workspace access, no network, no clipboard, no shell."
+    },
+    "zh-CN": {
+      "name": "任务清单面板",
+      "description": "在独立面板里按会话实时显示任务清单：每个对话一张可折叠卡片、卡片标题用你给对话起的真实名字，多个正在跑的任务同时显示、互不覆盖，实时显示已完成 / 进行中 / 待办 / 受阻。",
+      "safetyNotes": "申请两项权限：ui.panel 和 agent.tool.register。注册一个 Agent 工具（task_update），把当前清单按会话写到本插件自己的数据目录。为了让卡片显示真实会话名和运行/结束状态，面板以只读方式打开本机 pi.sqlite，只读取 sessions 的标题和最新一条 turn 的状态——绝不读消息正文、绝不写库。另监听宿主的 session:turnEnded 事件（仅含会话 id、轮次 id、结束原因）作为兜底。不访问工作区、不联网、不用剪贴板、不用 shell。清单文本只来自模型的工具调用。"
+    }
+  },
+  "main": "main.js",
+  "ui": {
+    "panel": "renderer/index.html",
+    "width": 460,
+    "height": 720,
+    "title": {
+      "en": "Tasks",
+      "zh-CN": "任务清单"
+    }
+  },
+  "contributes": {
+    "agentTools": [
+      {
+        "name": "task_update",
+        "risk": "low",
+        "description": "更新任务清单面板：把当前会话的开发计划 / 待办清单推送到独立的「任务清单」面板。面板按会话分栏，每个会话一张可折叠卡片、互不覆盖，卡片标题用你给这个对话起的真实名字，多个正在跑的任务同时显示，实时显示已完成 / 进行中 / 待办 / 受阻。开始多步任务时就先推一份粗清单，之后每开始 / 完成一项或卡住时再调一次（每次传完整清单，覆盖本会话这一栏）。title 可写清单名，但面板优先显示会话名。tasks 必须是对象数组、不要传 JSON 字符串。传空数组则移除本会话这一栏。返回已完成数 / 总数。",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "清单标题，可选。面板优先显示对话的真实名字，此项仅在拿不到会话名时兜底。"
+            },
+            "tasks": {
+              "type": "array",
+              "description": "完整的任务项数组，按显示顺序排列。每次调用都传全量，覆盖本会话这一栏。传空数组则移除本会话。",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "description": "任务描述"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["todo", "doing", "done", "blocked"],
+                    "description": "todo=待办（默认）, doing=进行中, done=已完成, blocked=受阻"
+                  },
+                  "note": {
+                    "type": "string",
+                    "description": "可选补充说明，例如卡在哪、验证结果"
+                  }
+                },
+                "required": ["text"]
+              }
+            },
+            "open": {
+              "type": "boolean",
+              "description": "是否打开/前置面板窗口，默认 true"
+            }
+          },
+          "required": ["tasks"]
+        }
+      }
+    ],
+    "commands": [
+      {
+        "id": "taskpanel.open",
+        "title": "Task Panel: Open",
+        "category": "Task Panel",
+        "keywords": ["task", "todo", "checklist", "panel", "任务", "清单", "待办"]
+      },
+      {
+        "id": "taskpanel.clear",
+        "title": "Task Panel: Clear",
+        "category": "Task Panel",
+        "keywords": ["task", "clear", "清空", "清单"]
+      },
+      {
+        "id": "taskpanel.sample",
+        "title": "Task Panel: Render sample",
+        "category": "Task Panel",
+        "keywords": ["task", "sample", "demo", "示例"]
+      }
+    ]
+  },
+  "permissions": ["ui.panel", "agent.tool.register"],
+  "engines": {
+    "piDesktop": ">=0.2.0"
+  },
+  "activationEvents": [
+    "onStartup",
+    "onCommand:taskpanel.open",
+    "onCommand:taskpanel.clear",
+    "onCommand:taskpanel.sample"
+  ]
+}
